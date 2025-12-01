@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="hi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Health AI Assistant</title>
+  <link rel="stylesheet" href="/static/css/home.css">
+</head>
+
+<body>
+  <nav>
+    <div class="logo-area">
+      <div class="logo">H</div>
+      <h1>Health AI Assistant</h1>
+    </div>
+    <div class="desktop-nav">
+      <a href="#">Home</a>
+      <a href="#">About</a>
+      <button id="profile-btn"
+        style="margin-left:20px;width:40px;height:40px;border:none;border-radius:50%;background:linear-gradient(to bottom right,#4ade80,#3b82f6);color:#fff;font-weight:bold;cursor:pointer;">R</button>
+    </div>
+    <div id="hamburger"><span></span><span></span><span></span></div>
+  </nav>
+
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#">Home</a>
+    <a href="#">About</a>
+    <button id="profile-btn-mobile"
+      style="width:40px;height:40px;border:none;border-radius:50%;background:linear-gradient(to bottom right,#4ade80,#3b82f6);color:#fff;font-weight:bold;">R</button>
+  </div>
+
+  <div id="profile-card">
+    <div class="profile-header">
+      <div class="profile-pic">
+          {% if dec_info %}
+      {{ dec_info.uname[0] }}
+       {% endif %}</div>
+      {% if dec_info %}
+      <p>Name: {{ dec_info.uname }}</p>
+        <p>Fitness Level:{{dec_info.flevel}}</p>
+        <p>Age: {{ dec_info.age }}</p>
+         <p>Weight: {{ dec_info.weight }}</p>
+        <p>Height:{{ dec_info.height }}</p>
+      <p>Gender: {{ dec_info.gender }}</p>
+      <p>Goal: {{ dec_info.goal }}</p>
+    {% else %}
+      <p>No info available.</p>
+    {% endif %}
+    </div></div>
+
+  <main>
+    <div class="container">
+      <h2>Welcome back,
+          {% if dec_info %}
+      {{ dec_info.uname[0] }}
+       {% endif %} 👋</h2>
+      <p>Your health journey starts here</p>
+
+      <div class="grid">
+        <div class="card">
+          <div class="icon bg1">❤</div>
+          <h3 style="font-size:25px;margin:10px 0;">Your Diet </h3>
+          <p></p>
+          <button class="btn bg1">View Diet</button>
+        </div>
+
+        <div class="card">
+          <div class="icon bg2">💪</div>
+          <h3 style="font-size:25px;margin:10px 0;">Daily rotine</h3>
+          <p></p>
+          <button class="btn bg2">view Daily Rotine</button>
+        </div>
+
+        <div class="card">
+          <div class="icon bg3">🥗</div>
+          <h3 style="font-size:25px;margin:10px 0;">your Save Histroy</h3>
+          <p></p>
+          <button class="btn bg3">History</button>
+        </div>
+
+        <div class="card" style="background:linear-gradient(to bottom right,#3b82f6,#8b5cf6);color:#fff;">
+          <div class="icon" style="background:rgba(255,255,255,0.2);color:#fff;">🤖</div>
+          <h3 style="font-size:25px;margin:10px 0;">AI Health Chat</h3>
+          <p>Ask me anything about your health, fitness, or nutrition</p>
+            <button class="btn" style="background:#fff;color:#5b21b6;" onclick="location.href='{{ url_for('chatbot') }}'">Start Chatting</button>
+
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="/static/js/home.js"></script>
+
+</body>
+
+</html>
