@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="hi">
 
@@ -14,84 +15,138 @@
       <div class="logo">H</div>
       <h1>Health AI Assistant</h1>
     </div>
+
     <div class="desktop-nav">
       <a href="#">Home</a>
       <a href="#">About</a>
-      <button id="profile-btn"
-        style="margin-left:20px;width:40px;height:40px;border:none;border-radius:50%;background:linear-gradient(to bottom right,#4ade80,#3b82f6);color:#fff;font-weight:bold;cursor:pointer;">R</button>
+      <button id="profileBtn" class="profile-btn">
+        {% if dec_info %}{{ dec_info.uname[0] }}{% else %}U{% endif %}
+      </button>
     </div>
+
     <div id="hamburger"><span></span><span></span><span></span></div>
   </nav>
 
-  <div class="mobile-menu" id="mobile-menu">
+  <div class="mobile-menu" id="mobileMenu">
     <a href="#">Home</a>
     <a href="#">About</a>
-    <button id="profile-btn-mobile"
-      style="width:40px;height:40px;border:none;border-radius:50%;background:linear-gradient(to bottom right,#4ade80,#3b82f6);color:#fff;font-weight:bold;">R</button>
+    <button id="profileBtnMobile" class="profile-btn">
+      {% if dec_info %}{{ dec_info.uname[0] }}{% else %}U{% endif %}
+    </button>
   </div>
 
-  <div id="profile-card">
+  <!-- Profile Card -->
+  <div id="profileCard">
+    <button class="detail-panel__close" onclick="document.getElementById('profileCard').style.display='none'">×</button>
+
+    {% if dec_info %}
     <div class="profile-header">
-      <div class="profile-pic">
-          {% if dec_info %}
-      {{ dec_info.uname[0] }}
-       {% endif %}</div>
-      {% if dec_info %}
-      <p>Name: {{ dec_info.uname }}</p>
-        <p>Fitness Level:{{dec_info.flevel}}</p>
-        <p>Age: {{ dec_info.age }}</p>
-         <p>Weight: {{ dec_info.weight }}</p>
-        <p>Height:{{ dec_info.height }}</p>
-      <p>Gender: {{ dec_info.gender }}</p>
-      <p>Goal: {{ dec_info.goal }}</p>
+      <div class="profile-pic">{{ dec_info.uname[0] }}</div>
+      <div class="profile-info">
+        <h3>{{ dec_info.uname }}</h3>
+        <p class="profile-badge">Fitness Level: {{ dec_info.flevel }}</p>
+      </div>
+    </div>
+
+    <div class="profile-row"><span>Age:</span> <span>{{ dec_info.age }}</span></div>
+    <div class="profile-row"><span>Weight:</span> <span>{{ dec_info.weight }}</span></div>
+    <div class="profile-row"><span>Height:</span> <span>{{ dec_info.height }}</span></div>
+    <div class="profile-row"><span>Gender:</span> <span>{{ dec_info.gender }}</span></div>
+    <div class="profile-row"><span>Goal:</span> <span>{{ dec_info.goal }}</span></div>
+
     {% else %}
-      <p>No info available.</p>
+    <p style="text-align:center;color:#666;">No info available.</p>
     {% endif %}
-    </div></div>
+  </div>
+
+  <!-- Right-side detail panel -->
+  <div id="detailPanel" class="detail-panel">
+    <button class="detail-panel__close" onclick="document.getElementById('detailPanel').style.display='none'">×</button>
+    <div class="detail-panel__header">
+      <div class="detail-panel__icon" id="detailIcon"></div>
+      <h3 class="detail-panel__title" id="detailTitle"></h3>
+    </div>
+    <div class="detail-panel__content" id="detailContent"></div>
+  </div>
 
   <main>
     <div class="container">
-      <h2>Welcome back,
-          {% if dec_info %}
-      {{ dec_info.uname[0] }}
-       {% endif %} 👋</h2>
+      <h2>Welcome back, {% if dec_info %}{{ dec_info.uname }}{% else %}User{% endif %}! 👋</h2>
       <p>Your health journey starts here</p>
 
       <div class="grid">
-        <div class="card">
-          <div class="icon bg1">❤</div>
-          <h3 style="font-size:25px;margin:10px 0;">Your Diet </h3>
-          <p></p>
-          <button class="btn bg1">View Diet</button>
+
+        <!-- Your Diet -->
+        <div class="card" onclick="showCardDetails('diet')">
+          <div class="card__icon bg-gradient-red">❤</div>
+          <div class="card__content">
+            <h3 class="card__title">Your Diet</h3>
+            <p class="card__description">
+              {% if dec_pro %}
+              <ul>
+                {% for key, value in dec_pro.items() %}
+                <li><strong>{{ key|capitalize }}:</strong> {{ value }}</li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </p>
+          </div>
         </div>
 
-        <div class="card">
-          <div class="icon bg2">💪</div>
-          <h3 style="font-size:25px;margin:10px 0;">Daily rotine</h3>
-          <p></p>
-          <button class="btn bg2">view Daily Rotine</button>
+        <!-- Daily Routine -->
+        <div class="card" onclick="showCardDetails('routine')">
+          <div class="card__icon bg-gradient-orange">💪</div>
+          <div class="card__content">
+            <h3 class="card__title">Daily Routine</h3>
+            <p class="card__description">
+              {% if dec_sed %}
+              <ul>
+                {% for key, value in dec_sed.items() %}
+                <li><strong>{{ key.replace('_', ' ')|capitalize }}:</strong> {{ value }}</li>
+                {% endfor %}
+              </ul>
+              {% endif %}
+            </p>
+          </div>
         </div>
 
-        <div class="card">
-          <div class="icon bg3">🥗</div>
-          <h3 style="font-size:25px;margin:10px 0;">your Save Histroy</h3>
-          <p></p>
-          <button class="btn bg3">History</button>
+        <!-- Food Suggestion -->
+        <div class="card" onclick="showCardDetails('history')">
+          <div class="card__icon bg-gradient-green">🥗</div>
+          <div class="card__content">
+            <h3 class="card__title">Food suggestion</h3>
+            <p class="card__description">
+               {% if dec_fod %}
+        {% if dec_fod is string %}
+          {{ dec_fod|safe }}
+        {% elif dec_fod is iterable %}
+          {% for item in dec_fod %}
+                <li><strong><span style="display: inline;">{{ item }}<br></span></strong></li>
+            {% if not loop.last %} {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% else %}
+        No food suggestions available
+      {% endif %}
+            </p>
+          </div>
         </div>
 
-        <div class="card" style="background:linear-gradient(to bottom right,#3b82f6,#8b5cf6);color:#fff;">
-          <div class="icon" style="background:rgba(255,255,255,0.2);color:#fff;">🤖</div>
-          <h3 style="font-size:25px;margin:10px 0;">AI Health Chat</h3>
-          <p>Ask me anything about your health, fitness, or nutrition</p>
-            <button class="btn" style="background:#fff;color:#5b21b6;" onclick="location.href='{{ url_for('chatbot') }}'">Start Chatting</button>
-
+        <!-- AI Chat -->
+        <div class="card card--featured">
+          <div class="card__icon card__icon--transparent">🤖</div>
+          <div class="card__content">
+            <h3 class="card__title">AI Health Chat</h3>
+            <p class="card__description">Ask me anything about your health, fitness, or nutrition</p>
+          </div>
+          <button class="btn btn--white" onclick="location.href='{{ url_for('chatbot') }}'">Start Chatting</button>
         </div>
+
       </div>
     </div>
   </main>
 
   <script src="/static/js/home.js"></script>
-
 </body>
 
 </html>

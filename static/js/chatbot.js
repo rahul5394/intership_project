@@ -89,7 +89,7 @@ let isDarkMode = false;
         addMessage(data.reply, false);
       } catch (err) {
         hideTyping();
-        addMessage('<p><strong>⚠️ Error:</strong> Server se connect nahi ho paya.</p><p>Check karein ki Flask app chal rahi hai.</p>', false);
+        addMessage('<p><strong>⚠️ Error:</strong> Sorry I Am Not Abel To Give Any Answer For This Question </p><p>Please Try Later .</p>', false);
         console.error(err);
       } finally {
         btn.disabled = false;

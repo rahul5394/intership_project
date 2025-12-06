@@ -1,14 +1,15 @@
 from flask import Flask, render_template, request, redirect, jsonify, session
 import mysql.connector
+import google.generativeai as genai
 import pers_info_db as pers_db
 import login as log_in
 import signup as sign_up
-import google.generativeai as genai
-from chatbot import (
-    markdown_to_html
-)
+from chatbot import ( markdown_to_html)
+from prompt import (get_diet_plan,get_work_sed,get_fod_rec)
+from sign_prompt import (get_email)
+#session key
 app = Flask(__name__)
-app.secret_key = 'keyAIzaSyDctl4OUFUkpYKS2A8zDypFP4RxQVs3WFo'
+app.secret_key = ''
 # MySQL Connection
 mydb = mysql.connector.connect(
     host="localhost",
@@ -16,8 +17,13 @@ mydb = mysql.connector.connect(
     password="rahul",
     database="login_sign_in"
 )
-genai.configure(api_key="AIzaSyDctl4OUFUkpYKS2A8zDypFP4RxQVs3WFo")
-
+#api key
+genai.configure(api_key="")
+#dictonar for session
+dec_info={}
+dec_pro={}
+dec_sed={}
+dec_fod={}
 # Select Gemini model
 model = genai.GenerativeModel("gemini-2.0-flash")
 cursor = mydb.cursor()
@@ -34,11 +40,18 @@ def home():
 def adduser():
     email = request.form.get("loginEmail")
     password = request.form.get("loginPassword")
-    result =log_in.login_check(email,password)
-
+    result=log_in.login_check(email,password)
     if result == 1:
+        dec_info=log_in.login_check1( request.form.get("loginEmail"))
+        dec_pro=get_diet_plan(email)
+        dec_sed=get_work_sed(email)
+        dec_fod=get_fod_rec(email)
+        session['dec_pro'] = dec_pro
+        session['dec_info'] = dec_info
+        session['dec_sed'] = dec_sed
+        session['dec_fod'] = dec_fod
         return redirect("/home")
-    else:
+    else :
         return redirect("/")
 
 
@@ -49,6 +62,7 @@ def sign__up():
     pno= request.form.get("pno")
     password = request.form.get("password")
     r=sign_up.sign_up_check(name,email,pno,password)
+
     if r ==1:
         return redirect("/personal")
     else:
@@ -72,27 +86,35 @@ def per_info():
         gender = request.form.get("gender")
         goal = request.form.get("goal")
         pers_db.chk(uname, flevel, age, weight, height, gender, goal)
-        print("DEBUG:", uname, flevel, age, weight, height, gender, goal)
         dec_info={'uname':uname,'flevel':flevel,'age':age,'weight':weight,'height':height,'gender':gender,'goal':goal}
+        email= get_email()
+        dec_pro = get_diet_plan(email)
+        dec_sed = get_work_sed(email)
+        dec_fod = get_fod_rec(email)
+        session['dec_pro'] = dec_pro
+        session['dec_sed'] = dec_sed
+        session['dec_fod'] = dec_fod
         session['dec_info'] = dec_info
-        return render_template("home.html",dec_info=session['dec_info'])
+        return redirect("/home")
 
 @app.route('/home')
 def home_page():
-    return render_template("home.html")
+    return render_template("home.html",dec_info=session['dec_info'],dec_pro=session['dec_pro'],dec_sed=session['dec_sed'],dec_fod=session['dec_fod'])
+
 
 
 @app.route("/chat", methods=["POST"])
 def chat():
     user_input = request.json.get("message", "")
-
     # Generate response
     response = model.generate_content(user_input)
     raw_text = response.text
     cleaned_text = markdown_to_html(raw_text)
-
+    print(cleaned_text)
     return jsonify({"reply": cleaned_text})
 
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+
